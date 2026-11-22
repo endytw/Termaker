@@ -48,6 +48,8 @@
 
     extern int cols;
     extern int rows;
+	
+	extern position pos;
 
     int init(void);
     int end(void);
@@ -55,4 +57,28 @@
     void move(int, int);
     void set_color(int, int);
     void reload_frame(void);
+	
+	/*	Abstraction API
+	
+		TO ENABLE ABSTRACTION API, DEFINE "_TERM_ABS_API"
+	*/
+	
+	#if defined(_TERM_ABS_API)
+	
+	
+	//	Objects
+	typedef struct {
+		position obj_pos;
+		char *sprite;
+		
+		// Metadata
+		signed char is_visible;
+	} object;
+	
+	int object_init(object obj);
+	void object_draw(object obj);
+	void object_move(object obj, position obj_pos);
+	void object_clear(object obj);
+	int object_break(object obj);
+	#endif
 #endif
