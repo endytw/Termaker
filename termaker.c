@@ -24,6 +24,8 @@
 
     static HANDLE handle;
     static WORD word;
+	
+	static CONSOLE_SCREEN_BUFFER_INFO scr_buffer;
 #endif
 
 /*  Initilization and end of program.
@@ -64,7 +66,6 @@ int init(void) {
         GetConsoleScreenBufferInfo(handle, &i);
         word = i.wAttributes;
     
-        CONSOLE_SCREEN_BUFFER_INFO scr_buffer;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &scr_buffer);
     
         rows = scr_buffer.srWindow.Bottom - scr_buffer.srWindow.Top + 1;
@@ -85,7 +86,7 @@ int end(void) {
 		WORD attribute = (WORD)((0x0 << 4) | (0x0F & 0x0F));
 		SetConsoleTextAttribute(handle, attribute);
 	#else
-		printf("\033[0m\033[2J\033[H");
+		printf("\033[2J\033[H\033[0m");
 	#endif
     fflush(stdout);
     return 0;
@@ -105,7 +106,6 @@ void reload_frame(void) {
         rows = window.ws_row;
         cols = window.ws_col;
     #elif defined(_WIN32) || defined(_WIN64)
-        CONSOLE_SCREEN_BUFFER_INFO scr_buffer;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &scr_buffer);
     
         rows = scr_buffer.srWindow.Bottom - scr_buffer.srWindow.Top + 1;
@@ -120,6 +120,7 @@ void set_color(int color_number, int bg_color_number) {
 		SetConsoleTextAttribute(handle, attribute);
 	#else
 		printf("\033[0m");
+		fflush(stdout);
 		switch (color_number) {
 			case 0: printf("\033[31m");       break;
 			case 1: printf("\033[38;5;214m"); break;
@@ -144,12 +145,30 @@ void set_color(int color_number, int bg_color_number) {
 			case 8: printf("\033[47m");       break;
 		}
 	#endif
+	fflush(stdout);
 }
 
 void move(int height, int width) {
+	#if defined(_WIN32) || defined(_WIN64)
+	COORD coordinates = {width, height};
+	SetConsoleCursorPosition(handle, coordinates);
+	#else
     printf("\033[%d;%dH", height+1, width+1);
+	#endif
     fflush(stdout);
     pos.x = width;
     pos.y = height;
     return;
 }
+
+
+
+/*	Abstraction API
+	
+	TO ENABLE ABSTRACTION API, DEFINE "_TERM_ABS_API"
+*/
+
+
+#if defined(_TERM_ABS_API)
+
+#endif
