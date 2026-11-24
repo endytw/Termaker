@@ -12,4 +12,4 @@ gcc <your args> termaker.c <your files> <your args>
 
 ## License
 
-Project licensed under GNU General Public License v3
+Project licensed under GNU General Public License v3 ONLY
